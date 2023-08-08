@@ -1,8 +1,8 @@
 CREATE TABLE annotations (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     video_id INTEGER NOT NULL REFERENCES videos(id),
-    start_time TEXT NOT NULL,
-    end_time TEXT NOT NULL,
+    start_time INTEGER NOT NULL,
+    end_time INTEGER NOT NULL,
     a_type TEXT NOT NULL,
     a_text TEXT NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,

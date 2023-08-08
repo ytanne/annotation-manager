@@ -1,0 +1,6 @@
+server
+config/
+database/
+.git/
+.gitignore
+Dockerfile

@@ -19,4 +19,9 @@
 
 # Go workspace file
 go.work
+
+# database folder
+database/
+
+# local binary
 server

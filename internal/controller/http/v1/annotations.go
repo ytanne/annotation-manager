@@ -6,6 +6,7 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
+	"github.com/ytanne/annotation-manager/pkg/errors"
 	"github.com/ytanne/annotation-manager/pkg/models"
 )
 
@@ -34,7 +35,7 @@ func (s server) UpdateAnnotation(g *gin.Context) {
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
 		log.Println("obtaining id failed", err)
-		g.JSON(http.StatusBadGateway, "failed to update annotation")
+		g.JSON(http.StatusInternalServerError, "failed to update annotation")
 		return
 	}
 
@@ -63,14 +64,18 @@ func (s server) GetAnnotation(g *gin.Context) {
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
 		log.Println("obtaining id failed", err)
-		g.JSON(http.StatusBadGateway, "failed to get annotation")
+		g.JSON(http.StatusInternalServerError, "failed to get annotation")
 		return
 	}
 
 	annotation, err := s.u.GetAnnotation(g.Request.Context(), id)
-	if err != nil {
+	if err == errors.ErrNotFound {
+		log.Println("annotation not found", err)
+		g.JSON(http.StatusNotFound, "annotation not found")
+		return
+	} else if err != nil {
 		log.Println("obtaining annotation failed", err)
-		g.JSON(http.StatusBadGateway, "failed to get annotation")
+		g.JSON(http.StatusInternalServerError, "failed to get annotation")
 		return
 	}
 
@@ -83,14 +88,18 @@ func (s server) GetAnnotationsByVideoID(g *gin.Context) {
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
 		log.Println("obtaining id failed", err)
-		g.JSON(http.StatusBadGateway, "failed to get annotations")
+		g.JSON(http.StatusInternalServerError, "failed to get annotations")
 		return
 	}
 
 	annotations, err := s.u.GetAnnotationsByVideoID(g.Request.Context(), id)
-	if err != nil {
+	if err == errors.ErrNotFound {
+		log.Println("annotations not found", err)
+		g.JSON(http.StatusNotFound, "annotations not found")
+		return
+	} else if err != nil {
 		log.Println("obtaining annotations failed", err)
-		g.JSON(http.StatusBadGateway, "failed to get annotations")
+		g.JSON(http.StatusInternalServerError, "failed to get annotations")
 		return
 	}
 
@@ -103,14 +112,14 @@ func (s server) DeleteAnnotation(g *gin.Context) {
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
 		log.Println("obtaining id failed", err)
-		g.JSON(http.StatusBadGateway, "failed to get annotations")
+		g.JSON(http.StatusInternalServerError, "failed to get annotations")
 		return
 	}
 
 	err = s.u.DeleteAnnotation(g.Request.Context(), id)
 	if err != nil {
 		log.Println("deleting annotation failed", err)
-		g.JSON(http.StatusBadGateway, "failed to delete annotation")
+		g.JSON(http.StatusInternalServerError, "failed to delete annotation")
 		return
 	}
 

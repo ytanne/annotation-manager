@@ -6,6 +6,7 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
+	"github.com/ytanne/annotation-manager/pkg/errors"
 	"github.com/ytanne/annotation-manager/pkg/models"
 )
 
@@ -34,7 +35,7 @@ func (s server) UpdateVideo(g *gin.Context) {
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
 		log.Println("obtaining id failed", err)
-		g.JSON(http.StatusBadGateway, "failed to update video")
+		g.JSON(http.StatusInternalServerError, "failed to update video")
 		return
 	}
 
@@ -63,14 +64,18 @@ func (s server) GetVideo(g *gin.Context) {
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
 		log.Println("obtaining id failed", err)
-		g.JSON(http.StatusBadGateway, "failed to get video")
+		g.JSON(http.StatusInternalServerError, "failed to get video")
 		return
 	}
 
 	video, err := s.u.GetVideo(g.Request.Context(), id)
-	if err != nil {
+	if err == errors.ErrNotFound {
+		log.Println("video not found", err)
+		g.JSON(http.StatusNotFound, "video not found")
+		return
+	} else if err != nil {
 		log.Println("obtaining video failed", err)
-		g.JSON(http.StatusBadGateway, "failed to get video")
+		g.JSON(http.StatusInternalServerError, "failed to get video")
 		return
 	}
 
@@ -83,14 +88,14 @@ func (s server) DeleteVideo(g *gin.Context) {
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
 		log.Println("obtaining id failed", err)
-		g.JSON(http.StatusBadGateway, "failed to get videos")
+		g.JSON(http.StatusInternalServerError, "failed to get videos")
 		return
 	}
 
 	err = s.u.DeleteVideo(g.Request.Context(), id)
 	if err != nil {
 		log.Println("deleting video failed", err)
-		g.JSON(http.StatusBadGateway, "failed to delete video")
+		g.JSON(http.StatusInternalServerError, "failed to delete video")
 		return
 	}
 

@@ -3,15 +3,13 @@ package usecase
 import (
 	"context"
 	"fmt"
-	"time"
 
 	"github.com/ytanne/annotation-manager/pkg/models"
 )
 
 func (u usecase) AddVideo(ctx context.Context, video models.Video) (int, error) {
-	_, err := time.ParseDuration(video.Duration)
-	if err != nil {
-		return -1, fmt.Errorf("could not parse duration of the video with id %d", video.ID)
+	if video.Duration <= 0 {
+		return -1, fmt.Errorf("duration of the video with id %d shouldn't negative or zero", video.ID)
 	}
 
 	return u.r.AddVideo(ctx, video)
@@ -22,9 +20,8 @@ func (u usecase) GetVideo(ctx context.Context, id int) (models.Video, error) {
 }
 
 func (u usecase) UpdateVideo(ctx context.Context, video models.Video) error {
-	_, err := time.ParseDuration(video.Duration)
-	if err != nil {
-		return fmt.Errorf("could not parse duration of the video with id %d", video.ID)
+	if video.Duration <= 0 {
+		return fmt.Errorf("duration of the video with id %d shouldn't negative or zero", video.ID)
 	}
 
 	return u.r.UpdateVideo(ctx, video)
